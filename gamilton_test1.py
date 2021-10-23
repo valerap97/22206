@@ -1,10 +1,11 @@
 from itertools import permutations
 
+
 # Функция для нахождения минимального пути обхода
 # Возвращает порядок городов и минимальное время
 def minimumPathStations(graph, start_vertex, total_maxweight, V): 
     # Все перестановки, кроме первой точки
-    vertex = [i for i in range(V) if i!=start_vertex]
+    vertex = [i for i in range(V) if i!=start_vertex]  
     # Запоминаем максимум для сравнения и варианты обхода без начальной точки
     min_path = total_maxweight 
     min_vertex_order = []
@@ -27,24 +28,61 @@ def minimumPathStations(graph, start_vertex, total_maxweight, V):
         # Проверяем на кратчайший
         if min_path > current_pathweight:
             min_vertex_order = current_vertex_order
-            min_path = current_pathweight
+            min_path = current_pathweight        
 
     return min_vertex_order, min_path
  
  
 if __name__ == "__main__": 
 
-    stations = ["Барикадная", "Кропоткинская", "Библиотека имени Ленина",
-                "Охотный ряд", "Третьяковская"]
+    stations = ["Барикадная", "Библиотека имени Ленина", "Третьяковская", 
+                "Кропоткинская","Охотный ряд"]
     # Матрица смежности графа
     # Возможно придётся оформить ввод согласно выбору точки
     # И ввод названия станции
     station = input("Введите название станции: ")
-    graph = [[0, 13, 11, 9, 8], [13, 0, 2, 4, 13],
+    
+    station_dist = [
+                    # Барикадная
+                    [[0, 14, 12, 10, 12],[14, 0, 2, 4, 14],[12, 2, 0, 2, 12],[10, 4, 2, 0, 10],[12, 14, 12, 10, 0]],
 
-             [11, 2, 0, 2, 11],
+                    # Библиотека имени Ленина
+                    [[0, 2, 12, 2, 12],[2, 0, 14, 4, 14],[12, 14, 2, 10, 12],[2, 4, 10, 2, 10],[12, 14, 12, 10, 0]],
 
-             [9, 4, 2, 0, 9], [8, 13, 11, 9, 0]]
+                    # Третьяковская
+                    [[0, 13, 11, 9, 12],[14, 0, 2, 4, 14],[12, 2, 0, 2, 12],[10, 4, 2, 0, 10],[12, 14, 12, 10, 0]],
+
+                    # Кропоткинская
+                    [[0, 14, 2, 4, 14],[14, 0, 12, 10, 12],[2, 12, 0, 2, 12],[4, 10, 2, 0, 10],[14, 12, 12, 10, 0]],
+                    
+                    # Охотный ряд
+                    [[0, 4, 2, 10, 10],[4, 0, 2, 14, 14],[2, 2, 0, 12, 12],[10, 14, 12, 0, 12],[10, 14, 12, 12, 0]]]
+    station_order = [["Барикадная", "Кропоткинская", "Библиотека имени Ленина",
+                    "Третьяковская","Охотный ряд"],
+                    
+                    ["Библиотека имени ленина", "Кропоткинская", "Барикадная",
+                    "Охотный ряд", "Третьяковская"],
+                    
+                    ["Третьяковская", "Кропоткинская", "Библиотека имени ленина",
+                    "Охотный ряд", "Барикадная"],
+                    
+                    ["Кропоткинская", "Барикадная", "Библиотека имени ленина",
+                    "Охотный ряд", "Третьяковская"],
+                    
+                    ["Охотный ряд", "Кропоткинская", "Библиотека имени ленина",
+                     "Барикадная", "Третьяковская"]]
+    
+    k = 0
+    for i in stations:
+        if i == station:
+            k = stations.index(i)
+    
+    graph = station_dist[k]
+    stations = station_order[k]
+    import numpy as np
+    graph_npy = np.asarray(graph)
+    np.save('adjacency.npy', graph)            
+    print(graph)
 
     # Начальная точка
     start_vertex = 0
@@ -55,8 +93,18 @@ if __name__ == "__main__":
     # Запоминаем выводимые значения
     vertexes, min_path_length = minimumPathStations(graph, start_vertex, max_weight, vertex_count)
     # Выводим улицы в порядке обхода
+    final_stations=[]
     for i in vertexes:
-        print(stations[i])
-    # Выводим количество минут
+        final_stations.append(stations[i])
+    import csv
+ 
+    with open('answer.csv', 'w') as f:
+
+        # using csv.writer method from CSV package
+        write = csv.writer(f)
+
+        write.writerow(final_stations)
+
+        # Выводим количество минут
     print("\n")
-    print(min_path_length, "минуты")
+    print("Минуты: ", min_path_length)
